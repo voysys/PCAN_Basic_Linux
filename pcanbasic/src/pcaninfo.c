@@ -555,7 +555,7 @@ int pcaninfo_get(struct pcaninfo_list ** pcilist, int do_init) {
 	struct dirent **entpcan;
 	int npcan, i, len;
 	int ires;
-	char * path;
+	const char * path;
 
 	/* scan sys 'pcan' dir */
 	ires = 0;
