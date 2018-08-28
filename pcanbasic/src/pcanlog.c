@@ -94,11 +94,11 @@ void pcanlog_set(const PCANLOG_LEVEL lvl, const char *filename, const int showti
 void pcanlog_log(const PCANLOG_LEVEL lvl, const char *fmt, ...) {
 	va_list ap;
 	FILE *pfout;
-	char buf[512];
+	char buf[1024] = {};
 
 	pfout = (g_pcanlog.f != NULL) ? g_pcanlog.f : stdout;
 
-	va_start(ap, fmt);
+	
 	if (!pcanlog_should_write(lvl))
 		goto lbl_exit;
 	if (g_pcanlog.btimestamp) {
@@ -106,11 +106,15 @@ void pcanlog_log(const PCANLOG_LEVEL lvl, const char *fmt, ...) {
 		gettimeofday(&tv, NULL);
 		fprintf(pfout, "%010u.%06u: ", (unsigned int )tv.tv_sec, (unsigned int )tv.tv_usec);
 	}
-	vfprintf(pfout, fmt, ap);
-	if (lvl == LVL_DEBUG)
-		fflush(pfout);
+	
+	va_start(ap, fmt);
 	vsnprintf(buf, sizeof(buf), fmt, ap);
 	va_end(ap);
+
+	fprintf(pfout, "%s", buf);
+	if (lvl == LVL_DEBUG)
+		fflush(pfout);
+
 	pcblog_write(buf, MIN(sizeof(buf), strnlen(buf, sizeof(buf))));
 
 lbl_exit:
